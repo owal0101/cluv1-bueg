@@ -9,6 +9,10 @@ import com.shop.dto.OrderHistDto;
 import com.shop.dto.OrderItemDto;
 import com.shop.entity.*;
 import com.shop.repository.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,7 +25,12 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 회원 서비스
+ *
+ * @author 공통
+ * @version 1.0
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -35,8 +44,18 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final EmailService emailService;
     private final SmsService smsService;
-
-    public void processPointUsage(Member member, Order order) {
+    /**
+     * 사용 포인트 계산 메소드
+     *
+     * @param member 회원 포인트를 가져오기
+     * @param order 주문에 사용한 포인트 가져오기
+     *
+     */
+    @Operation(summary = "사용 포인트 계산 메소드", description = "사용 포인트 계산")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용 포인트 계산"),
+            @ApiResponse(responseCode = "400", description = "사용 포인트 계산 실패")})
+    public void processPointUsage(@Parameter(description = "회원 포인트를 가져오기")Member member, @Parameter(description = "주문에 사용한 포인트 가져오기")Order order) {
         member.setPoint(member.getPoint() - order.getUsedPoint() + order.getAccPoint());
 
         memberRepository.save(member);
@@ -81,8 +100,19 @@ public class OrderService {
 
         return order.getId();
     }
-
-    public Long orders(List<OrderDto> orderDtoList, String email, Integer usedPoint) {
+    /**
+     * 상품 주문 메소드
+     *
+     * @param orderDtoList 상품주문 목록 dto
+     * @param email 회원 레포지토리에서 찾을 이메일
+     * @param usedPoint 사용된 포인트
+     *
+     */
+    @Operation(summary = "상품 주문 메소드", description = "상품 주문")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 주문"),
+            @ApiResponse(responseCode = "400", description = "상품 주문 실패")})
+    public Long orders(@Parameter(description = "상품 주문 목록")List<OrderDto> orderDtoList, @Parameter(description = "회원 이메일")String email, @Parameter(description = "사용 포인트")Integer usedPoint) {
         Member member = memberRepository.findByEmail(email);
 
         if(member.getPoint() < usedPoint) {

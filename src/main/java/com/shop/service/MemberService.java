@@ -5,6 +5,10 @@ import com.shop.entity.Member;
 import com.shop.entity.OAuth2Member;
 import com.shop.repository.MemberRepository;
 import com.shop.repository.OAuth2MemberRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +19,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+/**
+ * 회원 서비스
+ *
+ * @author 공통
+ * @version 1.0
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -59,11 +68,6 @@ public class MemberService implements UserDetailsService {
                 .build();
     }
 
-    public int getPointByEmail(String email) {
-        Member member = memberRepository.findByEmail(email);
-
-        return member.getPoint();
-    }
 
     public void updatePassword(Long memberId, String password) {
         memberRepository.updatePassword(memberId, new BCryptPasswordEncoder().encode(password));
@@ -78,9 +82,20 @@ public class MemberService implements UserDetailsService {
 
         return true;
     }
-
+    /**
+     *
+     *
+     * @param memberSearchDto 회원 검색 후 담을 dto
+     * @param pageable 현재 로그인된 회원
+     *
+     * @return 회원레포지토리에서 getAdminMemberPage에 파라미터 담아 반환
+     */
+    @Operation(summary = "회원관리 조회 서비스", description = "회원관리 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원관리 조회"),
+            @ApiResponse(responseCode = "400", description = "회원관리 조회 실패")})
     @Transactional(readOnly = true)
-    public Page<Member> getAdminMemberPage(MemberSearchDto memberSearchDto, Pageable pageable){
+    public Page<Member> getAdminMemberPage(@Parameter(description = "회원 검색 dto")MemberSearchDto memberSearchDto, @Parameter(description = "페이지 기능")Pageable pageable){
         return memberRepository.getAdminMemberPage(memberSearchDto, pageable);
     }
 

@@ -1,0 +1,11 @@
+com.shop
+com.shop.config
+com.shop.constant
+com.shop.controller
+com.shop.dto
+com.shop.entity
+com.shop.exception
+com.shop.interceptor
+com.shop.mapstruct
+com.shop.repository
+com.shop.service

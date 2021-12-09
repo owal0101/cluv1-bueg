@@ -13,6 +13,11 @@ import com.shop.repository.OAuth2MemberRepository;
 import com.shop.service.AuthTokenService;
 import com.shop.service.EmailService;
 import com.shop.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,10 +37,16 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Optional;
-
+/**
+ * 회원 컨트롤러
+ *
+ * @author 공통
+ * @version 1.0
+ */
 @Slf4j
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "회원 컨트롤러", description = "회원 컨트롤러 목록")
 @RequestMapping("/members")
 public class MemberController {
 
@@ -219,9 +230,24 @@ public class MemberController {
 
         return new ResponseEntity<String>("", HttpStatus.OK);
     }
+    /**
+     * 회원관리 컨트롤러
+     *
+     * @param memberSearchDto 회원 검색 후 담을 dto
+     * @param page 페이지 기능
+     * @param model 뷰에 보내질 attribute
+     *
+     * @return member/membermng 이동 페이지
+     */
 
+    @Operation(summary = "회원관리 조회 컨트롤러", description = "회원관리 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원관리 조회"),
+            @ApiResponse(responseCode = "400", description = "회원관리 조회 실패")})
     @GetMapping(value = {"/admin/memberMng", "/admin/memberMng/{page}"})
-    public String memberManage(MemberSearchDto memberSearchDto, @PathVariable("page") Optional<Integer> page, Model model) {
+
+    public String memberManage(@Parameter(description = "회원 검색 dto")MemberSearchDto memberSearchDto, @Parameter(description = "페이지 기능")@PathVariable("page") Optional<Integer> page, @Parameter(description = "회원 검색을 담을 model")Model model) {
+
         Pageable pageable = PageRequest.of(page.isPresent()? page.get() : 0, 10);
         Page<Member> members = memberService.getAdminMemberPage(memberSearchDto, pageable);
 
